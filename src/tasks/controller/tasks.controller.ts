@@ -1,5 +1,18 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { CreateTaskDTO } from '../dto/create-task.dto';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
+import {
+  CreateTaskDTO,
+  GetTaskFilterDTO,
+  UpdateTaskDTO,
+} from '../dto/create-task.dto';
 import { Task } from '../model/task.model';
 import { TasksService } from '../service/tasks.service';
 
@@ -12,7 +25,15 @@ export class TasksController {
     return this.taskService.getAllTasks();
   }
 
-  @Get(':id')
+  @Get()
+  getTasks(@Query() filterDto: GetTaskFilterDTO): Task[] {
+    if (Object.keys(filterDto).length) {
+      return this.taskService.getTasksWithFilter(filterDto);
+    }
+    return this.taskService.getAllTasks();
+  }
+
+  @Get('/:id')
   getTaskById(@Param() taskId: string): Task {
     return this.taskService.findTaskById(taskId);
   }
@@ -20,5 +41,15 @@ export class TasksController {
   @Post()
   createTask(@Body() createTaskDto: CreateTaskDTO): Task {
     return this.taskService.createTask(createTaskDto);
+  }
+
+  @Patch('/:id')
+  updateTask(@Body() updateTaskDto: UpdateTaskDTO): Task {
+    return this.taskService.updateTask(updateTaskDto);
+  }
+
+  @Delete(':id')
+  deleteTaskById(@Param() taskId: string): void {
+    return this.taskService.deleteTaskById(taskId);
   }
 }
